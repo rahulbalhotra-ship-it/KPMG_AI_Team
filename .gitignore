@@ -1,0 +1,30 @@
+# Environment files and credentials
+.env
+.env.local
+.env.*
+backend/.env
+**/.env
+**/.env.*
+test_key.py
+
+# Python files and virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# User specific or local log files
+*.log
+agent_trace.json
+project_state.json

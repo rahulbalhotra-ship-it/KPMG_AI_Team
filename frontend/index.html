@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KPMG Solutions & Analytics - Agentic AI Simulator</title>
+  <meta name="description" content="Sims-like 2D 8-bit simulation of the KPMG Solutions and Analytics Agentic AI Team.">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div id="completion-banner" class="completion-banner" style="display: none;">
+    <span class="completion-text">🏆 PROJECT COMPLETED! ALL DELIVERABLES SECURED 🏆</span>
+    <button class="close-banner-btn"
+      onclick="document.getElementById('completion-banner').style.display='none'">&times;</button>
+  </div>
+
+  <header>
+    <div>
+      <h1>KPMG AGENTIC AI OFFICE</h1>
+      <div class="subtitle">SOLUTIONS & ANALYTICS MULTI AGENT TEAM</div>
+    </div>
+    <div style="font-family: var(--font-retro); font-size: 8px; color: var(--border-neon);">
+      SYSTEM STATUS: <span style="color: #48BB78; animation: blink 1s infinite;">ACTIVE</span>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Simulation Screen -->
+    <div class="simulation-panel">
+      <div class="panel-header">
+        <span class="panel-title">2D OFFICE SIMULATOR</span>
+        <!-- Live Milestone Progress Bar -->
+        <div id="live-project-progress" class="live-progress-container">
+          <div class="progress-line-bg">
+            <div id="live-progress-fill" class="progress-line-fill"></div>
+          </div>
+          <div class="milestones-row">
+            <div class="milestone-node" id="node-planning">
+              <span class="diamond">♦</span>
+              <span class="node-label">PLANNING</span>
+            </div>
+            <div class="milestone-node" id="node-requirements">
+              <span class="diamond">♦</span>
+              <span class="node-label">REQ</span>
+            </div>
+            <div class="milestone-node" id="node-design">
+              <span class="diamond">♦</span>
+              <span class="node-label">DESIGN</span>
+            </div>
+            <div class="milestone-node" id="node-development">
+              <span class="diamond">♦</span>
+              <span class="node-label">DEV</span>
+            </div>
+            <div class="milestone-node" id="node-testing">
+              <span class="diamond">♦</span>
+              <span class="node-label">TEST</span>
+            </div>
+            <div class="milestone-node" id="node-completed">
+              <span class="diamond">♦</span>
+              <span class="node-label">DONE</span>
+            </div>
+          </div>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 14px; color: var(--accent-pink);">v1.0.0</span>
+      </div>
+      <div class="canvas-wrapper">
+        <canvas id="office-canvas"></canvas>
+      </div>
+      <!-- Simulation Actions Bar -->
+      <div class="simulation-actions-bar">
+        <button onclick="triggerStandup()">DAILY STANDUP</button>
+        <button onclick="backToWork()">BACK TO WORK</button>
+        <button onclick="triggerBreak()" class="btn-pink">COFFEE BREAK</button>
+        <button onclick="triggerRandomTasks()" class="btn-pink">DISPATCH TASKS</button>
+      </div>
+    </div>
+
+    <!-- Resizable Divider Handle -->
+    <div id="resize-divider" class="resize-divider"></div>
+
+    <!-- Right Sidebar Controls & Info -->
+    <div class="sidebar">
+      <!-- Agent Character Sheet Card (Game Style!) -->
+      <div id="agent-sheet-card" class="card character-sheet-card"
+        style="margin-bottom: 0px; max-height: none !important;">
+        <div class="card-header-wrapper"
+          style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(0, 240, 255, 0.2); padding-bottom: 5px; margin-bottom: 10px;">
+          <span class="card-title"
+            style="margin-bottom: 0; border-bottom: none; padding-bottom: 0; color: var(--border-neon); text-shadow: 1px 1px var(--accent-pink);">AGENT
+            CHARACTER SHEET</span>
+          <button id="edit-agent-btn" class="upload-btn"
+            style="padding: 4px 8px; font-size: 7px; border-color: var(--border-neon); color: var(--border-neon); display: flex; align-items: center; gap: 4px;">✏️
+            CUSTOMIZE</button>
+        </div>
+
+        <div class="character-sheet-layout" style="display: flex; gap: 15px; margin-bottom: 8px;">
+          <!-- Left side: Portrait Preview -->
+          <div class="portrait-container" style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+            <div
+              style="border: 2px solid var(--border-neon); background-color: #0b0f19; padding: 4px; border-radius: 4px;">
+              <canvas id="agent-preview-canvas" width="64" height="64"
+                style="width: 64px; height: 64px; image-rendering: pixelated; image-rendering: crisp-edges;"></canvas>
+            </div>
+            <span id="char-level" style="font-family: var(--font-retro); font-size: 6px; color: #ecc94b;">LVL 5</span>
+          </div>
+
+          <!-- Right side: Stats / RPG Bars -->
+          <div class="stats-container" style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+            <div class="stat-name-role">
+              <div id="char-name"
+                style="font-family: var(--font-retro); font-size: 8px; color: #fff; margin-bottom: 2px; text-shadow: 0 0 5px var(--border-neon); word-break: break-all;">
+                PMAgent</div>
+              <div id="char-role" style="font-size: 11px; color: #a0aec0; font-style: italic;">Project Manager</div>
+            </div>
+
+            <!-- RPG Progress Bars -->
+            <div class="rpg-bar-row" style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-family: var(--font-retro); font-size: 6px; color: #48BB78; width: 15px;">HP</span>
+              <div class="rpg-bar-bg"
+                style="flex: 1; background-color: #0b0f19; height: 8px; border: 1px solid #48BB78; border-radius: 2px; position: relative; overflow: hidden;">
+                <div id="char-hp-bar"
+                  style="height: 100%; background-color: #48BB78; width: 100%; transition: width 0.3s;"></div>
+              </div>
+              <span id="char-hp-val"
+                style="font-size: 9px; color: #48BB78; font-family: var(--font-mono); width: 45px; text-align: right;">100/100</span>
+            </div>
+            <div class="rpg-bar-row" style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-family: var(--font-retro); font-size: 6px; color: #63B3ED; width: 15px;">MP</span>
+              <div class="rpg-bar-bg"
+                style="flex: 1; background-color: #0b0f19; height: 8px; border: 1px solid #3182CE; border-radius: 2px; position: relative; overflow: hidden;">
+                <div id="char-mp-bar"
+                  style="height: 100%; background-color: #3182CE; width: 100%; transition: width 0.3s;"></div>
+              </div>
+              <span id="char-mp-val"
+                style="font-size: 9px; color: #63B3ED; font-family: var(--font-mono); width: 45px; text-align: right;">80/80</span>
+            </div>
+            <div class="rpg-bar-row" style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-family: var(--font-retro); font-size: 6px; color: #9F7AEA; width: 15px;">XP</span>
+              <div class="rpg-bar-bg"
+                style="flex: 1; background-color: #0b0f19; height: 8px; border: 1px solid #718096; border-radius: 2px; position: relative; overflow: hidden;">
+                <div id="char-xp-bar"
+                  style="height: 100%; background-color: #9F7AEA; width: 70%; transition: width 0.3s;"></div>
+              </div>
+              <span id="char-xp-val"
+                style="font-size: 9px; color: #9F7AEA; font-family: var(--font-mono); width: 45px; text-align: right;">350/500</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills Area -->
+        <div class="skills-section" style="margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-retro); font-size: 6px; color: #ecc94b;">ACTIVE SKILLS:</span>
+          <div id="char-skills-list" style="display: flex; flex-wrap: wrap; gap: 5px;">
+            <!-- dynamic badges -->
+          </div>
+        </div>
+
+        <!-- Persona Text Area -->
+        <div class="persona-section" style="display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: var(--font-retro); font-size: 6px; color: var(--accent-pink);">BEHAVIORAL
+            PERSONA:</span>
+          <div id="char-persona-desc"
+            style="background-color: #0b0f19; border: 1px solid rgba(255, 0, 127, 0.2); border-radius: 4px; padding: 6px 8px; font-size: 11px; color: var(--text-main); max-height: 50px; overflow-y: auto; line-height: 1.3;">
+            Coordinating project plan and timelines...
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Portal & Chat Terminal -->
+      <div class="card client-portal-card" style="flex: 1; display: flex; flex-direction: column;">
+        <div class="card-header-wrapper"
+          style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255, 0, 127, 0.2); padding-bottom: 5px; margin-bottom: 15px;">
+          <span class="card-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">CLIENT
+            PORTAL</span>
+          <div style="display: flex; gap: 8px;">
+            <button id="inbox-btn" class="upload-btn"
+              style="padding: 4px 8px; font-size: 7px; border-color: var(--border-neon); color: var(--border-neon); position: relative;">
+              📬 INBOX <span id="inbox-badge"
+                style="display: none; background-color: var(--accent-pink); color: white; border-radius: 50%; padding: 1px 4px; font-size: 8px; position: absolute; top: -5px; right: -5px; border: 1px solid var(--border-neon); line-height: 1;">0</span>
+            </button>
+            <button id="deliverables-btn" class="upload-btn"
+              style="padding: 4px 8px; font-size: 7px; border-color: var(--border-neon); color: var(--border-neon);">📂
+              DELIVERABLES</button>
+          </div>
+        </div>
+
+
+        <!-- Clickable Agent Tabs -->
+        <div class="agent-tabs">
+          <div class="agent-tab active" data-agent="PMAgent">PMAgent</div>
+          <div class="agent-tab" data-agent="Consultant">Consultant</div>
+          <div class="agent-tab" data-agent="Partner">Partner</div>
+          <div class="agent-tab" data-agent="Director">Director</div>
+          <div class="agent-tab" data-agent="DevAgent">DevAgent</div>
+          <div class="agent-tab" data-agent="DesignAgent">DesignAgent</div>
+          <div class="agent-tab" data-agent="QAAgent">QAAgent</div>
+        </div>
+
+        <!-- Sign-off Approval Banner -->
+        <div id="signoff-banner" class="signoff-banner" style="display: none;">
+          <span class="signoff-message">PLAN READY. REVIEW & SIGN OFF:</span>
+          <button id="signoff-btn" class="signoff-btn">SIGN OFF PLAN</button>
+        </div>
+
+        <div id="log-feed" class="log-feed" style="flex: 1; margin-bottom: 10px;"></div>
+
+        <!-- Shared Files Section (Bottom) -->
+        <div class="bottom-files-section">
+          <span class="meta-label">SHARED FILES</span>
+          <div class="files-row">
+            <div id="shared-files-list" class="shared-files-list">
+              <span class="no-files">No files uploaded yet</span>
+            </div>
+            <button class="upload-btn" onclick="document.getElementById('file-upload').click()">+ ADD FILE</button>
+            <input type="file" id="file-upload" style="display: none;" multiple>
+          </div>
+        </div>
+
+        <div class="chat-input-container" style="padding: 0; border-top: none; margin-top: 5px;">
+          <input type="text" id="chat-input" placeholder="Interact with PM Agent (e.g. 'PMAgent, call a standup')"
+            autocomplete="off">
+          <button id="send-chat-btn">SEND</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Deliverables Modal -->
+  <div id="deliverables-modal" class="retro-modal" style="display: none;">
+    <div class="retro-modal-content">
+      <div class="retro-modal-header">
+        <span>📂 PROJECT DELIVERABLES</span>
+        <span class="close-modal-btn" id="close-deliverables-modal">&times;</span>
+      </div>
+      <div class="retro-modal-body">
+        <div id="deliverables-list" class="deliverables-list">
+          <!-- Populated dynamically -->
+        </div>
+        <div class="modal-footer-actions" style="margin-top: 15px; display: flex; justify-content: space-between;">
+          <button id="reset-project-btn" class="btn-pink" style="padding: 6px 12px; font-size: 7px; width: 100%;">RESET
+            SIMULATION</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inbox Modal -->
+  <div id="inbox-modal" class="retro-modal" style="display: none;">
+    <div class="retro-modal-content"
+      style="max-width: 800px; width: 95%; height: 80vh; display: flex; flex-direction: column;">
+      <div class="retro-modal-header">
+        <span>📬 CLIENT EMAIL INBOX</span>
+        <span class="close-modal-btn" id="close-inbox-modal">&times;</span>
+      </div>
+      <div class="retro-modal-body" style="flex: 1; display: flex; gap: 15px; overflow: hidden; padding: 10px;">
+        <!-- Email List Panel -->
+        <div id="email-list-panel"
+          style="width: 35%; border-right: 1px solid rgba(0, 240, 255, 0.2); overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 8px;">
+          <!-- Populated dynamically -->
+        </div>
+        <!-- Email Content Panel -->
+        <div id="email-content-panel"
+          style="width: 65%; display: flex; flex-direction: column; background-color: #0b0f19; border: 1px solid rgba(255, 0, 127, 0.2); border-radius: 4px; padding: 15px; overflow-y: auto;">
+          <div id="email-detail-placeholder"
+            style="flex: 1; display: flex; align-items: center; justify-content: center; color: #a0aec0; font-family: var(--font-retro); font-size: 8px; text-align: center;">
+            SELECT AN EMAIL TO READ
+          </div>
+          <div id="email-detail-content" style="display: none; flex-direction: column; gap: 10px; height: 100%;">
+            <div class="email-headers"
+              style="border-bottom: 1px dashed rgba(0, 240, 255, 0.2); padding-bottom: 8px; font-family: var(--font-mono); font-size: 11px; color: #a0aec0; display: flex; flex-direction: column; gap: 4px;">
+              <div><strong style="color: var(--border-neon);">From:</strong> <span id="email-from"></span></div>
+              <div><strong style="color: var(--border-neon);">To:</strong> <span id="email-to"></span></div>
+              <div><strong style="color: var(--border-neon);">Date:</strong> <span id="email-date"></span></div>
+              <div><strong style="color: var(--border-neon);">Subject:</strong> <span id="email-subject"
+                  style="color: #fff; font-weight: bold;"></span></div>
+            </div>
+            <div id="email-body"
+              style="flex: 1; padding: 10px 0; font-family: var(--font-mono); font-size: 12px; color: var(--text-main); white-space: pre-wrap; overflow-y: auto;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gantt Chart Modal -->
+  <div id="gantt-modal" class="retro-modal" style="display: none;">
+    <div class="retro-modal-content" style="max-width: 600px;">
+      <div class="retro-modal-header">
+        <span>📊 PROJECT CHARTER & GANTT CHART</span>
+        <span class="close-modal-btn" id="close-gantt-modal">&times;</span>
+      </div>
+      <div class="retro-modal-body">
+        <!-- Visual Gantt Progress -->
+        <div class="gantt-chart-wrapper" style="margin-bottom: 15px;">
+          <div class="gantt-row" style="display: flex; align-items: center; margin-bottom: 8px;">
+            <span class="gantt-label"
+              style="width: 120px; font-family: var(--font-retro); font-size: 8px; color: var(--border-neon);">PLANNING</span>
+            <div class="gantt-bar-container"
+              style="flex: 1; background: #0b0f19; height: 16px; border: 1px solid var(--border-neon); position: relative;">
+              <div id="gantt-planning" class="gantt-bar"
+                style="height: 100%; background: var(--accent-pink); width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+          <div class="gantt-row" style="display: flex; align-items: center; margin-bottom: 8px;">
+            <span class="gantt-label"
+              style="width: 120px; font-family: var(--font-retro); font-size: 8px; color: var(--border-neon);">BA &
+              RESEARCH</span>
+            <div class="gantt-bar-container"
+              style="flex: 1; background: #0b0f19; height: 16px; border: 1px solid var(--border-neon); position: relative;">
+              <div id="gantt-requirements" class="gantt-bar"
+                style="height: 100%; background: var(--accent-pink); width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+          <div class="gantt-row" style="display: flex; align-items: center; margin-bottom: 8px;">
+            <span class="gantt-label"
+              style="width: 120px; font-family: var(--font-retro); font-size: 8px; color: var(--border-neon);">UI/UX
+              DESIGN</span>
+            <div class="gantt-bar-container"
+              style="flex: 1; background: #0b0f19; height: 16px; border: 1px solid var(--border-neon); position: relative;">
+              <div id="gantt-design" class="gantt-bar"
+                style="height: 100%; background: var(--accent-pink); width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+          <div class="gantt-row" style="display: flex; align-items: center; margin-bottom: 8px;">
+            <span class="gantt-label"
+              style="width: 120px; font-family: var(--font-retro); font-size: 8px; color: var(--border-neon);">DEVELOPMENT</span>
+            <div class="gantt-bar-container"
+              style="flex: 1; background: #0b0f19; height: 16px; border: 1px solid var(--border-neon); position: relative;">
+              <div id="gantt-dev" class="gantt-bar"
+                style="height: 100%; background: var(--accent-pink); width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+          <div class="gantt-row" style="display: flex; align-items: center; margin-bottom: 8px;">
+            <span class="gantt-label"
+              style="width: 120px; font-family: var(--font-retro); font-size: 8px; color: var(--border-neon);">QA &
+              TESTING</span>
+            <div class="gantt-bar-container"
+              style="flex: 1; background: #0b0f19; height: 16px; border: 1px solid var(--border-neon); position: relative;">
+              <div id="gantt-testing" class="gantt-bar"
+                style="height: 100%; background: var(--accent-pink); width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Markdown Output -->
+        <div class="charter-markdown-container">
+          <span class="meta-label">PROJECT CHARTER FILE</span>
+          <pre id="charter-content-text"
+            style="font-family: var(--font-mono); font-size: 12px; color: var(--text-main); background: #0b0f19; padding: 10px; border: 1px solid rgba(255, 0, 127, 0.3); max-height: 200px; overflow-y: auto; white-space: pre-wrap;">Loading project charter...</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <style>
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+  </style>
+
+  <!-- Agent Customize Modal (Game Style!) -->
+  <div id="agent-customize-modal" class="retro-modal" style="display: none;">
+    <div class="retro-modal-content" style="max-width: 500px; width: 95%;">
+      <div class="retro-modal-header">
+        <span>✏️ CUSTOMIZE AGENT CHARACTER</span>
+        <span class="close-modal-btn" id="close-customize-modal">&times;</span>
+      </div>
+      <div class="retro-modal-body" style="font-family: var(--font-mono); font-size: 13px;">
+        <form id="agent-customize-form" onsubmit="return false;"
+          style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="meta-label">CHARACTER NAME</label>
+              <input type="text" id="edit-char-name" required
+                style="background: #0b0f19; border: 1px solid var(--border-neon); color: #fff; padding: 6px 10px; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 14px;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="meta-label">ROLE / CLASS</label>
+              <input type="text" id="edit-char-role" required
+                style="background: #0b0f19; border: 1px solid var(--border-neon); color: #fff; padding: 6px 10px; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 14px;">
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label class="meta-label">ACTIVE SKILLS (COMMA SEPARATED)</label>
+            <input type="text" id="edit-char-skills"
+              style="background: #0b0f19; border: 1px solid var(--border-neon); color: #fff; padding: 6px 10px; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 14px;">
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label class="meta-label">BEHAVIORAL PERSONA (SYSTEM PROMPT)</label>
+            <textarea id="edit-char-persona" rows="5" required
+              style="background: #0b0f19; border: 1px solid var(--border-neon); color: #fff; padding: 6px 10px; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 12px; resize: vertical; line-height: 1.4;"></textarea>
+          </div>
+
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid rgba(0, 240, 255, 0.1); padding-top: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="meta-label">LLM ENGINE MODEL</label>
+              <select id="edit-char-model"
+                style="background: #0b0f19; border: 1px solid var(--border-neon); color: #fff; padding: 6px 10px; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 13px;">
+                <option value="gemini-3.5-flash">Gemini 3.5 Flash (Default)</option>
+                <option value="gemini-3.5-pro">Gemini 3.5 Pro (Advanced)</option>
+              </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="meta-label">TEMPERATURE (<span id="temp-val-display">0.7</span>)</label>
+              <input type="range" id="edit-char-temp" min="0" max="1" step="0.1" value="0.7"
+                style="accent-color: var(--border-neon); margin-top: 8px;">
+            </div>
+          </div>
+
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid rgba(0, 240, 255, 0.1); padding-top: 12px; margin-bottom: 5px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="meta-label">CLOTHES COLOR (HEX)</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="color" id="edit-char-clothes-color"
+                  style="background: transparent; border: none; width: 32px; height: 32px; cursor: pointer; padding: 0;">
+                <input type="text" id="edit-char-clothes-hex"
+                  style="background: #0b0f19; border: 1px solid var(--border-neon); color: #fff; padding: 6px 10px; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 13px; width: 100%;">
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label class="meta-label">HAIR COLOR (HEX)</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="color" id="edit-char-hair-color"
+                  style="background: transparent; border: none; width: 32px; height: 32px; cursor: pointer; padding: 0;">
+                <input type="text" id="edit-char-hair-hex"
+                  style="background: #0b0f19; border: 1px solid var(--border-neon); color: #fff; padding: 6px 10px; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 13px; width: 100%;">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions" style="display: flex; gap: 10px; margin-top: 5px;">
+            <button type="button" id="cancel-customize-btn" class="btn-pink"
+              style="flex: 1; padding: 8px;">CANCEL</button>
+            <button type="button" id="save-customize-btn" style="flex: 1; padding: 8px;">SAVE CHARACTER</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Assets Renderers and then initialize Game Engine -->
+  <script src="assets.js"></script>
+  <script src="game.js"></script>
+</body>
+
+</html>
